@@ -1,7 +1,4 @@
-from cmath import log
-from unittest import result
 import psycopg2
-
 from operator import itemgetter
 
 def execute(params, query):

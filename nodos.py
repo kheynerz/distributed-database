@@ -29,13 +29,20 @@ def updateCentral(newCentral: dict) -> None:
     newData = {"central": newCentral, "locals": locals}
     saveNodes(newData)
 
-def newLocal(data: dict) -> None: 
+def newLocal(data: dict) -> bool: 
     if not checkData(data): return
 
     central,  locals = getNodes()
+
+    for node in locals:
+        if node['name'] == data['name']:
+            return False
+
     locals.append(data)
     newData = {"central": central, "locals": locals}
     saveNodes(newData)
+
+    return True
 
 def removeLocal(name: str) -> bool:
     central,  locals = getNodes()
@@ -53,7 +60,24 @@ def removeLocal(name: str) -> bool:
 
     return True
 
+def getParams(name):
+    central, locals = getNodes()
+    if name == central['name']: return central
+    for node in locals:
+        if node['name'] == name: return node
+
+
+
+
+
+
+
+
 #updateCentral({"name": "INSTANCIA 1", "host": "localhost", "database": "postgres", "port": 5433, "user": "postgres", "password": "1234"})
 
+
+
+#print(removeLocal('INSTANCIA 2'))
+
 #newLocal({"name": "INSTANCIA 2", "host": "localhost", "database": "postgres", "port": 5434, "user": "postgres", "password": "1234"})
-#newLocal({"name": "INSTANCIA 3", "host": "localhost", "database": "postgres", "port": 5435, "user": "postgres", "password": "1234"})
+newLocal({"name": "INSTANCIA 3", "host": "localhost", "database": "postgres", "port": 5435, "user": "postgres", "password": "1234"})

@@ -1,1 +1,1 @@
-{"central": {"name": "", "host": "", "database": "", "port": 0, "user": "", "password": ""}, "locals": []}
+{"central": {"name": "Instancia 1", "host": "localhost", "database": "postgres", "port": 5433, "user": "postgres", "password": "1234"}, "locals": [{"name": "INSTANCIA 2", "host": "localhost", "database": "postgres", "port": 5434, "user": "postgres", "password": "1234"}, {"name": "INSTANCIA 3", "host": "localhost", "database": "postgres", "port": 5435, "user": "postgres", "password": "1234"}]}

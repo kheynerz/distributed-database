@@ -76,18 +76,22 @@ def createTable(name: str, node: dict) -> bool:
 
     return(_execute(getParams(node['name']), sql))
 
+def createForeignTable(name, origin, dest):
+    #TODO
+    pass
 
 
 def generateTables(attributes : dict) -> bool:
     name, central, locals = itemgetter('name', 'central', 'locals')(attributes)
 
     #CREATE TABLE FOR CENTRAL NODE
-    res = createTable(name, central)
+    createTable(name, central)
 
     #CREATE TABLE FOR LOCALS
     for node in locals:
         createTable(name, node)
-
+        createForeignTable(name,node, central)
+        createForeignTable(name,central, node)
 
 #Postgresql Connection
 params = {"host" : "localhost", "database" : "postgres", 'port': 5435, "user" : "postgres", "password" : "1234"}

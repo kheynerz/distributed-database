@@ -20,8 +20,6 @@ def checkData(data : dict) -> bool:
         print("ERROR")    
         return False
     return True
-
-
 def updateCentral(newCentral: dict) -> None:
     if not checkData(newCentral): return
 
@@ -73,11 +71,11 @@ def getParams(name):
 
 
 
-#updateCentral({"name": "INSTANCIA 1", "host": "localhost", "database": "postgres", "port": 5433, "user": "postgres", "password": "1234"})
+updateCentral({"name": "INSTANCIA 1", "host": "localhost", "database": "postgres", "port": 5433, "user": "postgres", "password": "1234"})
 
 
 
 #print(removeLocal('INSTANCIA 2'))
 
 #newLocal({"name": "INSTANCIA 2", "host": "localhost", "database": "postgres", "port": 5434, "user": "postgres", "password": "1234"})
-newLocal({"name": "INSTANCIA 3", "host": "localhost", "database": "postgres", "port": 5435, "user": "postgres", "password": "1234"})
+#newLocal({"name": "INSTANCIA 3", "host": "localhost", "database": "postgres", "port": 5435, "user": "postgres", "password": "1234"})

@@ -1,8 +1,7 @@
-from pickle import TRUE
 import psycopg2
 from operator import itemgetter
 
-from nodos import getNodes, getParams
+from nodos import getParams
 
 def _execute(params : dict, command: str) -> list:
     host, database, port, user, password = itemgetter('host', 'database', 'port', 'user', 'password')(params)
@@ -33,9 +32,9 @@ def createExtension(params : dict) -> list:
     extensionCommand = "DO $$ <<create_extension>> DECLARE installed BOOL := false; BEGIN SELECT (COUNT(*) = 1) into installed FROM pg_extension WHERE extname = 'postgres_fdw'; IF NOT installed THEN CREATE EXTENSION postgres_fdw; END IF; END create_extension $$;"
     return(_execute(params, extensionCommand))
 
-def createServer(params : dict) -> list: 
-    central, _ = getNodes()
-    name, host, database, port, user, password = itemgetter('name','host', 'database', 'port', 'user', 'password')(central)
+def createServer(params : dict, serverName : str) -> list: 
+    serverParams = getParams(serverName)
+    name, host, database, port, user, password = itemgetter('name','host', 'database', 'port', 'user', 'password')(serverParams)
     name = '_'.join(name.lower().split())       
 
     sql = "DO $$ <<create_server>> BEGIN "
@@ -45,15 +44,6 @@ def createServer(params : dict) -> list:
 
     return(_execute(params, sql))
 
-def createTable(nombre: str, attributes : dict) -> str:
-    if len(attributes) == 0: return ""
-
-    args = ""
-    for key in attributes.keys():
-        args += f"{key} {attributes[key]},"
-    
-    sql = f"CREATE TABLE {nombre} ({args[0:-1]});"
-    return sql
 
 
 def createTable(name: str, node: dict) -> bool:
@@ -76,38 +66,56 @@ def createTable(name: str, node: dict) -> bool:
 
     return(_execute(getParams(node['name']), sql))
 
-def createForeignTable(name, origin, dest):
-    #TODO
-    pass
+def createForeignTable(name, node, serverName):
+    attributes = node['attributes']
+
+    serverName = '_'.join(serverName.lower().split()) 
+    sql =  f"create foreign table remote_{name}_{serverName} ("
+
+    for a in attributes:
+        atrName, atrType = itemgetter('name', 'type')(a)
+        sql += f"{atrName} {atrType}, "
+
+    sql = sql[0:-2] + f") server {serverName}_postgres_fdw OPTIONS (schema_name 'public', table_name '{name}');"
+      
+    return(_execute(getParams(node['name']), sql))
 
 
 def generateTables(attributes : dict) -> bool:
     name, central, locals = itemgetter('name', 'central', 'locals')(attributes)
 
     #CREATE TABLE FOR CENTRAL NODE
-    createTable(name, central)
+    #createTable(name, central)
+
+    view_sql = f"CREATE OR REPLACE VIEW view_{name} AS SELECT * from {name} "
 
     #CREATE TABLE FOR LOCALS
     for node in locals:
+        serverName = '_'.join(node['name'].lower().split()) 
+        view_sql += f"UNION SELECT * FROM remote_{name}_{serverName} "
         createTable(name, node)
-        createForeignTable(name,node, central)
-        createForeignTable(name,central, node)
+        createForeignTable(name,node, central['name'])
+        createForeignTable(name,central, node['name'])
+
+    _execute(getParams(central['name']), view_sql)
+    
 
 #Postgresql Connection
-params = {"host" : "localhost", "database" : "postgres", 'port': 5435, "user" : "postgres", "password" : "1234"}
+#params = {"host" : "localhost", "database" : "postgres", 'port': 5435, "user" : "postgres", "password" : "1234"}
 #result = execute(param, extensionCommand)
 #result = execute(param, command_table('test2',{'nombre': 'varchar', 'edad': 'integer'}))
-#createExtension(params)
+
 
 #param = {"host" : "localhost", "database" : "postgres", 'port': 5434, "user" : "postgres", "password" : "1234"}
 #print(createServer(params))
 
+"""
 
 tabla = {
     "name": "personas",
     "central": 
         {
-            "name": "Instancia 1", 
+            "name": "INSTANCIA 1", 
             "attributes": [
                 {"name": "cedula", "type" : "varchar", "pk" : False, "null" : False },
                 {"name": "nombre", "type" : "varchar", "pk" : False, "null" : False },
@@ -138,5 +146,20 @@ tabla = {
     ]
 }
 
+"""
 
-generateTables(tabla)
+
+#print(getParams('INSTANCIA 1'))
+#createExtension(getParams('INSTANCIA 1'))
+#createExtension(getParams('INSTANCIA 2'))
+#createExtension(getParams('INSTANCIA 3'))
+
+#createServer(getParams('INSTANCIA 1'), 'INSTANCIA 2')
+#createServer(getParams('INSTANCIA 1'), 'INSTANCIA 3')
+
+#createServer(getParams('INSTANCIA 2'), 'INSTANCIA 1')
+#createServer(getParams('INSTANCIA 3'), 'INSTANCIA 1')
+
+#generateTables(tabla)
+
+

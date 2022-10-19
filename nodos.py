@@ -1,6 +1,5 @@
 import json
 from operator import itemgetter
-
 def getNodes() -> tuple:
     nodos = open('nodos.json', 'r')
     data = json.load(nodos)
@@ -12,6 +11,17 @@ def saveNodes(newData) -> None:
     nodos = open("nodos.json", "w")
     nodos.write(jsonData)
     nodos.close()
+
+def checkCentral() -> bool:
+    central, _ = getNodes()
+    try:
+        name, host, database, port, user, password = itemgetter('name','host', 'database', 'port', 'user', 'password')(central)
+    except KeyError:
+        print("ERROR")    
+        return False
+
+    return (name != "" and host != "" and database != "" and port != 0 and user != "" and password != "")
+
 
 def checkData(data : dict) -> bool:
     try:
@@ -69,9 +79,10 @@ def getParams(name):
 
 
 
+#updateCentral({"name": "", "host": "", "database": "", "port": 0, "user": "", "password": ""})
 
 
-updateCentral({"name": "INSTANCIA 1", "host": "localhost", "database": "postgres", "port": 5433, "user": "postgres", "password": "1234"})
+#updateCentral({"name": "INSTANCIA 1", "host": "localhost", "database": "postgres", "port": 5433, "user": "postgres", "password": "1234"})
 
 
 

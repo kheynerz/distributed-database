@@ -1,7 +1,10 @@
+import json
 import os
 
 
 import os
+
+from nodos import getNodes
 menu = "1.Vertical\n2.Horizontal\n3.Mixta\n4.Salir\n"
 
 def createTable():
@@ -36,9 +39,24 @@ def createTable():
         attributtes.append({"nombre": name,"tipo": dataTypes[dt-1],"pk": pk,"null": null})
         opt = input("Continuar y/n")
 
+    return tableName, attributtes
+
+def chooseNodes():
+    json_central, json_locals = getNodes()
+    nodos=[json_central["name"]]
+
+    for x in json_locals:
+        addNode=input("Segmentar en la tabla: "+x["name"]+" y/n?")
+        option = True if (addNode == 'y' or addNode == 'ye' or addNode == 'yes') else False
+        if option:
+            nodos.append(x["name"])
+    
+    return nodos
+    
 
 def vertical():
     createTable()
+    chooseNodes()
 
 def horizontal():
     createTable()

@@ -43,7 +43,6 @@ def central():
         return
 
     print(f"Datos actuales:\nNodo: {name}\nMotor: {motor}\nHost: {host}\nDatabase: {database}\nPort: {port}\nUsername: {user}\nPassword: XXXXXXXXX")
-    
     opt = input("Desea cambiar los datos del nodo central? y/n: ").lower()
 
     menuCentral = "1.Nombre\n2.Host\n3.Database\n4.Port\n5.Username\n6.Password\n7.Salir\n"

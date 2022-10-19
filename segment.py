@@ -1,9 +1,4 @@
-import json
 import os
-
-
-import os
-
 from nodos import getNodes
 menu = "1.Vertical\n2.Horizontal\n3.Mixta\n4.Salir\n"
 
@@ -42,9 +37,8 @@ def createTable():
     return tableName, attributtes
 
 def chooseNodes():
-    json_central, json_locals = getNodes()
+    _, json_locals = getNodes()
     nodos=[]
-
     for x in json_locals:
         addNode=input("Segmentar en la tabla: "+x["name"]+" y/n?")
         option = True if (addNode == 'y' or addNode == 'ye' or addNode == 'yes') else False
@@ -59,8 +53,51 @@ def vertical():
     chooseNodes()
 
 def horizontal():
-    createTable()
+    attributes = [{"nombre": "cedula", "tipo" : "varchar", "pk" : True, "null" : False },
+                {"nombre": "nombre", "tipo" : "varchar", "pk" : False, "null" : False },
+                {"nombre": "ape1", "tipo" : "varchar", "pk" : False, "null" : False },
+                {"nombre": "ape2", "tipo" : "varchar", "pk" : False, "null" : False }]
+    tableName = "personas"        #createTable()
 
+    nodes = chooseNodes()
+    centralNode, _ = getNodes()
+
+    json = {"name": tableName}    
+
+    central = {"name" : centralNode['name'], "attributes": []}
+    locals = []
+
+    for node in nodes:
+        locals.append({"name": node, "attributes": []})
+
+    for a in attributes:
+        if (a['pk']):
+            central["attributes"].append(a)
+            for node in locals:
+                node["attributes"].append(a)
+            continue
+
+        os.system('cls')
+        print("Nodos: ")
+        print(central["name"])
+        for x in nodes:
+            print(x)
+            
+        while True:
+            node = input(f'Digite el nodo para el atributo "{a["nombre"]}" de tipo {a["tipo"]}: ')
+            if (node in nodes) or (node == central["name"]): break
+        if node == central["name"]:
+            central["attributes"].append(a)
+            continue
+
+        for x in locals:
+            if  x["name"] == node:
+                x["attributes"].append(a)
+
+    json["central"] = central
+    json["locals"] = locals
+
+    input(json)
 def mix():
     createTable()
 

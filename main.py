@@ -7,8 +7,12 @@ import os
 menu1 = "1.Registrar Nodos\n2.Crear tabla y segmentar\n3.Salir\n"
 
 def main():
+    err = ""
     while True:
         os.system('cls')
+        if err != "":
+            print(err)
+        err = ""
         opt = input(menu1)
         match(opt):
             case "1": registerNodes()
@@ -16,7 +20,7 @@ def main():
                 if(checkCentral()):
                     segmentMain()
                 else:
-                    print("Tiene que registrar al menos el nodo central")
+                    err = "Tiene que registrar al menos el nodo central\n"
             case "3": break
             case other: pass
 

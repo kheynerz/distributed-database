@@ -1,4 +1,3 @@
-from re import S
 import psycopg2
 from operator import itemgetter
 
@@ -82,7 +81,7 @@ def createForeignTable(name, node, server):
     return(_execute(getParams(node['name']), sql))
 
 
-def createView(attributes, tables, name):
+def createView(attributes, name):
 
     view_sql = f"CREATE OR REPLACE VIEW view_{name} AS SELECT "# * from {name} "
 
@@ -237,4 +236,4 @@ tablaHorizontal = {
 }
 
 
-generateTables(tablaHorizontal)
+#generateTables(tablaHorizontal)

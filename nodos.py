@@ -87,6 +87,7 @@ def getParams(name):
 
 
 #print(removeLocal('INSTANCIA 2'))
+#print(removeLocal('INSTANCIA 3'))
 
 #newLocal({"name": "INSTANCIA 2", "host": "localhost", "database": "postgres", "port": 5434, "user": "postgres", "password": "1234"})
 #newLocal({"name": "INSTANCIA 3", "host": "localhost", "database": "postgres", "port": 5435, "user": "postgres", "password": "1234"})

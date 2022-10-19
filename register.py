@@ -1,10 +1,12 @@
+
+from cgitb import text
 from operator import itemgetter
 import os
+from connection import createExtension, createServer
 
 from nodos import checkCentral, getNodes, newLocal, removeLocal, updateCentral
 
 menu = "1.Nodo central\n2.Nodos locales\n3.Salir\n"
-
 
 def createNode():
     name = input("Nombre del nodo:")
@@ -39,7 +41,15 @@ def central():
         return False
 
     if (not checkCentral()):
-        updateCentral(createNode())
+        params = createNode()
+        result, err = createExtension(params)
+
+        
+        text = "Conexion Exitosa..." if result else "Credenciales incorrectas..."
+        if result:
+            updateCentral(params)
+
+        input(text)
         return
 
     print(f"Datos actuales:\nNodo: {name}\nMotor: {motor}\nHost: {host}\nDatabase: {database}\nPort: {port}\nUsername: {user}\nPassword: XXXXXXXXX")
@@ -80,6 +90,21 @@ def deleteNodes():
     node = input("Nombre del nodo a borrar: ")
     removeLocal(node)  
     
+def createNewLocal():
+    params = createNode()
+    result, err = createExtension(params)
+    text = "Conexion Exitosa..." if result else "Credenciales incorrectas..."
+    if result:
+        central, _ = getNodes()
+
+        newLocal(params)
+        createServer(params, central['name'])
+        createServer(central, params['name'])
+
+
+    input(text)
+    return
+
 def locals():
     menuLocals = "1.Nuevo nodo\n2.Borrar nodos\n3.Salir\n"
 
@@ -88,7 +113,7 @@ def locals():
         opt = input(menuLocals)
         os.system('cls')
         match(opt):
-            case "1": newLocal(createNode())
+            case "1": createNewLocal()
             case "2": deleteNodes()
             case "3": break
 
@@ -100,4 +125,3 @@ def registerNodes():
             case "1": central()
             case "2": locals()
             case "3": break
-            case other: pass

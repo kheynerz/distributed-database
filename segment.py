@@ -43,7 +43,7 @@ def createTable():
 
 def chooseNodes():
     json_central, json_locals = getNodes()
-    nodos=[json_central["name"]]
+    nodos=[]
 
     for x in json_locals:
         addNode=input("Segmentar en la tabla: "+x["name"]+" y/n?")

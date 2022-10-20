@@ -1,0 +1,32 @@
+{"name": "personas", 
+"central": 
+    {
+        "name": "INSTANCIA 1", 
+        "attributes": [
+            {"nombre": "cedula", "tipo": "varchar", "pk": true, "null": false}, 
+            {"nombre": "nombre", "tipo": "varchar", "pk": false, "null": false}, 
+            {"nombre": "ape1", "tipo": "varchar", "pk": false, "null": false}, 
+            {"nombre": "ape2", "tipo": "varchar", "pk": false, "null": false}
+        ]
+    }, 
+"locals": [
+    {
+        "name": "INSTANCIA 2",
+        "attributes": [
+            {"nombre": "cedula", "tipo": "varchar", "pk": true, "null": false},
+            {"nombre": "nombre", "tipo": "varchar", "pk": false, "null": false},
+            {"nombre": "ape1", "tipo": "varchar", "pk": false, "null": false}, 
+            {"nombre": "ape2", "tipo": "varchar", "pk": false, "null": false}
+        ]
+    }, 
+        {
+            "name": "INSTANCIA 3", 
+            "attributes": [
+                {"nombre": "cedula", "tipo": "varchar", "pk": true, "null": false},
+                {"nombre": "nombre", "tipo": "varchar", "pk": false, "null": false}, 
+                {"nombre": "ape1", "tipo": "varchar", "pk": false, "null": false}, 
+                {"nombre": "ape2", "tipo": "varchar", "pk": false, "null": false}
+            ]
+        }
+    ]
+}

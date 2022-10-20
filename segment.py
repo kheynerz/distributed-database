@@ -1,4 +1,6 @@
+import json
 import os
+from platform import node
 from nodos import getNodes
 menu = "1.Vertical\n2.Horizontal\n3.Mixta\n4.Salir\n"
 
@@ -46,11 +48,31 @@ def chooseNodes():
             nodos.append(x["name"])
     
     return nodos
-    
+
+def saveConfig(newConfig):
+    jsonData = json.dumps(newConfig)
+    configuracion = open('segmentacion.json','w')
+    configuracion.write(jsonData)
+    configuracion.close()
+ 
 
 def vertical():
-    createTable()
-    chooseNodes()
+    #createTable()
+    attributes = [{"nombre": "cedula", "tipo" : "varchar", "pk" : True, "null" : False },
+                {"nombre": "nombre", "tipo" : "varchar", "pk" : False, "null" : False },
+                {"nombre": "ape1", "tipo" : "varchar", "pk" : False, "null" : False },
+                {"nombre": "ape2", "tipo" : "varchar", "pk" : False, "null" : False }]
+    tableName = "personas" 
+
+    nodes = chooseNodes()
+    centralNode, _ = getNodes()
+
+    json = {"name": tableName, "central":{"name":centralNode["name"], "attributes" : attributes}, "locals": []}
+    for x in nodes:
+        templateLocal = {"name":x,"attributes":attributes}
+        json["locals"].append(templateLocal)
+        
+    saveConfig(json)
 
 def horizontal():
     attributes = [{"nombre": "cedula", "tipo" : "varchar", "pk" : True, "null" : False },
@@ -98,6 +120,8 @@ def horizontal():
     json["locals"] = locals
 
     input(json)
+
+
 def mix():
     createTable()
 

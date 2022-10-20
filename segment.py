@@ -1,6 +1,6 @@
 import json
 import os
-from platform import node
+from connection import generateTables
 from nodos import getNodes
 menu = "1.Vertical\n2.Horizontal\n3.Mixta\n4.Salir\n"
 
@@ -33,7 +33,7 @@ def createTable():
         null = True if (isNull == 'y' or isNull == 'ye' or isNull == 'yes') else False
     
 
-        attributtes.append({"nombre": name,"tipo": dataTypes[dt-1],"pk": pk,"null": null})
+        attributtes.append({"name": name,"type": dataTypes[dt-1],"pk": pk,"null": null})
         opt = input("Continuar y/n")
 
     return tableName, attributtes
@@ -75,10 +75,10 @@ def vertical():
     saveConfig(json)
 
 def horizontal():
-    attributes = [{"nombre": "cedula", "tipo" : "varchar", "pk" : True, "null" : False },
-                {"nombre": "nombre", "tipo" : "varchar", "pk" : False, "null" : False },
-                {"nombre": "ape1", "tipo" : "varchar", "pk" : False, "null" : False },
-                {"nombre": "ape2", "tipo" : "varchar", "pk" : False, "null" : False }]
+    attributes = [{"name": "cedula", "type" : "varchar", "pk" : True, "null" : False },
+                {"name": "nombre", "type" : "varchar", "pk" : False, "null" : False },
+                {"name": "ape1", "type" : "varchar", "pk" : False, "null" : False },
+                {"name": "ape2", "type" : "varchar", "pk" : False, "null" : False }]
     tableName = "personas"        #createTable()
 
     nodes = chooseNodes()
@@ -106,7 +106,7 @@ def horizontal():
             print(x)
             
         while True:
-            node = input(f'Digite el nodo para el atributo "{a["nombre"]}" de tipo {a["tipo"]}: ')
+            node = input(f'Digite el nodo para el atributo "{a["name"]}" de tipo {a["type"]}: ')
             if (node in nodes) or (node == central["name"]): break
         if node == central["name"]:
             central["attributes"].append(a)
@@ -119,8 +119,9 @@ def horizontal():
     json["central"] = central
     json["locals"] = locals
 
-    input(json)
 
+    input(json)
+    generateTables(json, "horizontal")
 
 def mix():
     createTable()

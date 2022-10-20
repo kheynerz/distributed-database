@@ -32,7 +32,6 @@ def createTable():
         isNull = input("Puede ser Null? y/n: ")
         null = True if (isNull == 'y' or isNull == 'ye' or isNull == 'yes') else False
     
-
         attributtes.append({"name": name,"type": dataTypes[dt-1],"pk": pk,"null": null})
         opt = input("Continuar y/n")
 
@@ -41,28 +40,17 @@ def createTable():
 def chooseNodes():
     _, json_locals = getNodes()
     nodos=[]
+    os.system('cls')
     for x in json_locals:
-        addNode=input("Segmentar en la tabla: "+x["name"]+" y/n? ")
+        addNode=input("Segmentar en la Instancia: "+x["name"]+" y/n? ")
         option = True if (addNode == 'y' or addNode == 'ye' or addNode == 'yes') else False
         if option:
             nodos.append(x["name"])
     
     return nodos
 
-def saveConfig(newConfig):
-    jsonData = json.dumps(newConfig)
-    configuracion = open('segmentacion.json','w')
-    configuracion.write(jsonData)
-    configuracion.close()
- 
-
 def vertical():
-    #createTable()
-    attributes = [{"nombre": "cedula", "tipo" : "varchar", "pk" : True, "null" : False },
-                {"nombre": "nombre", "tipo" : "varchar", "pk" : False, "null" : False },
-                {"nombre": "ape1", "tipo" : "varchar", "pk" : False, "null" : False },
-                {"nombre": "ape2", "tipo" : "varchar", "pk" : False, "null" : False }]
-    tableName = "personas" 
+    tableName, attributes = createTable()
 
     nodes = chooseNodes()
     centralNode, _ = getNodes()
@@ -72,7 +60,8 @@ def vertical():
         templateLocal = {"name":x,"attributes":attributes}
         json["locals"].append(templateLocal)
         
-    saveConfig(json)
+    input(json)
+    generateTables(json, "vertical")
 
 def horizontal():
     tableName, attributes = createTable()
@@ -118,7 +107,45 @@ def horizontal():
     generateTables(json, "horizontal")
 
 def mix():
-    createTable()
+    tableName, attributes = createTable()
+    nodes = chooseNodes()
+    centralNode, _ = getNodes()
+
+    json = {"name": tableName}    
+
+    central = {"name" : centralNode['name'], "attributes": []}
+    locals = []
+
+    for node in nodes:
+        locals.append({"name": node, "attributes": []})
+
+    for a in attributes:
+        os.system('cls')
+        if (a['pk']):
+            central["attributes"].append(a)
+            for node in locals:
+                node["attributes"].append(a)
+            continue
+            
+        print(f'Atributo: "{a["name"]}"  Tipo: {a["type"]}')
+
+        opt = input("Segmentar en la Instancia central: "+central["name"]+" y/n? ")
+        opt = True if (opt == 'y' or opt == 'ye' or opt == 'yes') else False
+        if opt:
+            central["attributes"].append(a)
+        
+        for node in locals:
+            opt = input("Segmentar en la Instancia: "+node["name"]+" y/n? ")
+            opt = True if (opt == 'y' or opt == 'ye' or opt == 'yes') else False
+            if opt:
+                node["attributes"].append(a)
+
+  
+    json["central"] = central
+    json["locals"] = locals
+
+    generateTables(json, "mix")
+
 
 def segmentMain():
     while True:
@@ -130,30 +157,19 @@ def segmentMain():
             case "2": horizontal()
             case "3": mix()
             case "4": break
-            case other: pass
 
-
-tabla = {
-    "name": "personitas",
-    "central": 
-        {
-            "name": "INSTANCIA 1", 
-            "attributes": [
-                {"name": "cedula", "type" : "varchar", "pk" : True, "null" : False },
-                {"name": "nombre", "type" : "varchar", "pk" : False, "null" : False },
-                {"name": "ape1", "type" : "varchar", "pk" : False, "null" : False },
-                {"name": "ape2", "type" : "varchar", "pk" : False, "null" : False }
-            ]
-        },
-    "locals": [
-        {
-            "name": "INSTANCIA 2", 
-            "attributes":[
-                {"name": "cedula", "type" : "varchar", "pk" : True, "null" : False },
-                {"name": "nombre", "type" : "varchar", "pk" : False, "null" : False },
-                {"name": "ape1", "type" : "varchar", "pk" : False, "null" : False },
-                {"name": "ape2", "type" : "varchar", "pk" : False, "null" : False }
-            ]
-        }
-    ]
-}
+{
+    'name': 'INSTANCIA 1', 
+    'attributes': [
+        {'name': 'a', 'type': 'INTEGER', 'pk': True, 'null': False}, 
+        {'name': 'b', 'type': 'VARCHAR', 'pk': False, 'null': False}]
+        
+        } 
+        
+[
+    {'name': 'INSTANCIA 2', 
+    'attributes': [
+        {'name': 'a', 'type': 'INTEGER', 'pk': True, 'null': False}, 
+        {'name': 'b', 'type': 'VARCHAR', 'pk': False, 'null': False}, 
+        {'name': 'c', 'type': 'FLOAT', 'pk': False, 'null': False}]}
+        ]

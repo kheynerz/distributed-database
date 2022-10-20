@@ -81,11 +81,10 @@ def createForeignTable(name, node, server):
     
     return(_execute(getParams(node['name']), sql))
 
-def createView(attributes, name):
+def createMixView(attributes):
+    name, central, locals = itemgetter('name','central', 'locals')(attributes)
 
     view_sql = f"CREATE OR REPLACE VIEW view_{name} AS SELECT "# * from {name} "
-
-    central, locals = itemgetter('central', 'locals')(attributes)
 
     allAtrs = central['attributes'].copy()
 
@@ -176,7 +175,6 @@ def createVerticalView(attributes : dict) -> bool:
         serverName = '_'.join(node['name'].lower().split()) 
         view_sql += f"UNION SELECT * FROM remote_{name}_{serverName} "
 
-    input(view_sql)
     _execute(getParams(central['name']), view_sql)
 
 """
@@ -216,7 +214,9 @@ def generateTables(attributes : dict, segmentType : str) -> bool:
         createVerticalView(attributes)
         return
 
-    createView(attributes, name)    
+    if segmentType == "mix":
+        createMixView(attributes)
+        return
 
 #Postgresql Connection
 #params = {"host" : "localhost", "database" : "postgres", 'port': 5435, "user" : "postgres", "password" : "1234"}

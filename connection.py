@@ -64,6 +64,7 @@ def createTable(name: str, node: dict) -> bool:
 
     sql = sql + pksql[0:-1] + "))" if pkCount > 0 else sql[0:-2] + ")"
 
+    print(sql)
     return(_execute(getParams(node['name']), sql))
 
 def createForeignTable(name, node, server):
@@ -123,26 +124,71 @@ def createView(attributes, name):
                 view_sql += 'Null as ' + col['name'] + ', '
         view_sql = view_sql[0:-2] + f" from remote_{name}_{serverName}"   
 
+
+    print(view_sql)
+    input()
     _execute(getParams(central['name']), view_sql)
 
 
 
-def generateTables(attributes : dict) -> bool:
+def createHorizontalView(attributes):
+    name, central, locals = itemgetter('name','central','locals')(attributes)
+    attrs = []
+    centralName = '_'.join(central['name'].lower().split()) 
+
+    def checkAtr(atr, attributes):
+        for a in attributes:
+            if a['name'] == atr['name']:
+                return True
+        return False    
+
+    for a in central['attributes']:
+        if(not checkAtr(a,attrs)):
+            attrs.append(a)
+
+    for node in locals:
+        for a in node['attributes']:
+            if(not checkAtr(a,attrs)):
+                attrs.append(a)
+
+    view_sql = f"CREATE OR REPLACE VIEW view_{name} AS SELECT "
+
+    for a in attrs:
+        if a['pk']:
+            view_sql += f"{centralName}.{a['name']}, "
+        else:
+            view_sql += f"{a['name']}, "
+
+    view_sql = view_sql[0:-2] + f" FROM {name} {centralName} "
+
+    for node in locals:
+        serverName = '_'.join(node['name'].lower().split()) 
+        view_sql += f"INNER JOIN remote_{name}_{serverName} ON "
+        for a in node['attributes']:
+            if a['pk']:
+                view_sql += f"{centralName}.{a['name']} = remote_{name}_{serverName}.{a['name']} and "
+            pass
+        view_sql = view_sql[0:-5]
+
+    _execute(getParams(central['name']),view_sql)
+
+def generateTables(attributes : dict, segmentType : str = "vertical") -> bool:
     name, central, locals = itemgetter('name', 'central', 'locals')(attributes)
 
     #CREATE TABLE FOR CENTRAL NODE
     createTable(name, central)
 
-    tables = []
-
     #CREATE TABLE FOR LOCALS
     for node in locals:
-        tables.append(node['name'])
         createTable(name, node)
         createForeignTable(name,node, central)
         createForeignTable(name,central, node)
 
-    createView(attributes, tables, name)    
+    if (segmentType == "horizontal"):
+        createHorizontalView(attributes)
+        return
+
+    createView(attributes, name)    
 
 #Postgresql Connection
 #params = {"host" : "localhost", "database" : "postgres", 'port': 5435, "user" : "postgres", "password" : "1234"}

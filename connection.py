@@ -1,3 +1,4 @@
+from threading import local
 import psycopg2
 from operator import itemgetter
 
@@ -64,7 +65,6 @@ def createTable(name: str, node: dict) -> bool:
 
     sql = sql + pksql[0:-1] + "))" if pkCount > 0 else sql[0:-2] + ")"
 
-    print(sql)
     return(_execute(getParams(node['name']), sql))
 
 def createForeignTable(name, node, server):
@@ -80,7 +80,6 @@ def createForeignTable(name, node, server):
     sql = sql[0:-2] + f") server {serverName}_postgres_fdw OPTIONS (schema_name 'public', table_name '{name}');"
     
     return(_execute(getParams(node['name']), sql))
-
 
 def createView(attributes, name):
 
@@ -124,11 +123,7 @@ def createView(attributes, name):
                 view_sql += 'Null as ' + col['name'] + ', '
         view_sql = view_sql[0:-2] + f" from remote_{name}_{serverName}"   
 
-
-    print(view_sql)
-    input()
     _execute(getParams(central['name']), view_sql)
-
 
 
 def createHorizontalView(attributes):
@@ -172,7 +167,35 @@ def createHorizontalView(attributes):
 
     _execute(getParams(central['name']),view_sql)
 
-def generateTables(attributes : dict, segmentType : str = "vertical") -> bool:
+def createVerticalView(attributes : dict) -> bool:
+    name, central, locals = itemgetter('name', 'central', 'locals')(attributes)
+
+    view_sql = f"CREATE OR REPLACE VIEW view_{name} AS SELECT * from {name} "
+
+    for node in locals:
+        serverName = '_'.join(node['name'].lower().split()) 
+        view_sql += f"UNION SELECT * FROM remote_{name}_{serverName} "
+
+    input(view_sql)
+    _execute(getParams(central['name']), view_sql)
+
+"""
+def dropTables(attributes):
+    name, central, locals = itemgetter('name', 'central', 'locals')(attributes)
+    
+    centralName = "remote_" +name +"_"+'_'.join(central['name'].lower().split()) 
+    centralParams = getParams(central['name'])
+
+    #_execute(centralParams, f"DROP TABLE IF EXISTS {name};")
+
+    for node in locals:
+        serverName = "remote_" +name +"_"+'_'.join(node['name'].lower().split()) 
+        print(serverName, centralName)
+        pass
+"""
+
+
+def generateTables(attributes : dict, segmentType : str) -> bool:
     name, central, locals = itemgetter('name', 'central', 'locals')(attributes)
 
     #CREATE TABLE FOR CENTRAL NODE
@@ -181,11 +204,16 @@ def generateTables(attributes : dict, segmentType : str = "vertical") -> bool:
     #CREATE TABLE FOR LOCALS
     for node in locals:
         createTable(name, node)
+
         createForeignTable(name,node, central)
         createForeignTable(name,central, node)
 
-    if (segmentType == "horizontal"):
+    if segmentType == "horizontal":
         createHorizontalView(attributes)
+        return
+
+    if segmentType == "vertical":
+        createVerticalView(attributes)
         return
 
     createView(attributes, name)    

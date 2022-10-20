@@ -41,24 +41,19 @@ def chooseNodes():
     _, json_locals = getNodes()
     nodos=[]
     for x in json_locals:
-        addNode=input("Segmentar en la tabla: "+x["name"]+" y/n?")
+        addNode=input("Segmentar en la tabla: "+x["name"]+" y/n? ")
         option = True if (addNode == 'y' or addNode == 'ye' or addNode == 'yes') else False
         if option:
             nodos.append(x["name"])
     
     return nodos
-    
 
 def vertical():
     createTable()
     chooseNodes()
 
 def horizontal():
-    attributes = [{"name": "cedula", "type" : "varchar", "pk" : True, "null" : False },
-                {"name": "nombre", "type" : "varchar", "pk" : False, "null" : False },
-                {"name": "ape1", "type" : "varchar", "pk" : False, "null" : False },
-                {"name": "ape2", "type" : "varchar", "pk" : False, "null" : False }]
-    tableName = "personas"        #createTable()
+    tableName, attributes = createTable()
 
     nodes = chooseNodes()
     centralNode, _ = getNodes()
@@ -98,8 +93,6 @@ def horizontal():
     json["central"] = central
     json["locals"] = locals
 
-
-    input(json)
     generateTables(json, "horizontal")
 
 def mix():
@@ -116,3 +109,29 @@ def segmentMain():
             case "3": mix()
             case "4": break
             case other: pass
+
+
+tabla = {
+    "name": "personitas",
+    "central": 
+        {
+            "name": "INSTANCIA 1", 
+            "attributes": [
+                {"name": "cedula", "type" : "varchar", "pk" : True, "null" : False },
+                {"name": "nombre", "type" : "varchar", "pk" : False, "null" : False },
+                {"name": "ape1", "type" : "varchar", "pk" : False, "null" : False },
+                {"name": "ape2", "type" : "varchar", "pk" : False, "null" : False }
+            ]
+        },
+    "locals": [
+        {
+            "name": "INSTANCIA 2", 
+            "attributes":[
+                {"name": "cedula", "type" : "varchar", "pk" : True, "null" : False },
+                {"name": "nombre", "type" : "varchar", "pk" : False, "null" : False },
+                {"name": "ape1", "type" : "varchar", "pk" : False, "null" : False },
+                {"name": "ape2", "type" : "varchar", "pk" : False, "null" : False }
+            ]
+        }
+    ]
+}

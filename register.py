@@ -44,42 +44,19 @@ def central():
         params = createNode()
         result, err = createExtension(params)
 
-        
         text = "Conexion Exitosa..." if result else "Credenciales incorrectas..."
         if result:
             updateCentral(params)
-
         input(text)
         return
 
     print(f"Datos actuales:\nNodo: {name}\nMotor: {motor}\nHost: {host}\nDatabase: {database}\nPort: {port}\nUsername: {user}\nPassword: XXXXXXXXX")
-    opt = input("Desea cambiar los datos del nodo central? y/n: ").lower()
-
-    menuCentral = "1.Nombre\n2.Host\n3.Database\n4.Port\n5.Username\n6.Password\n7.Salir\n"
+    opt = input("Desea restablecer los datos del nodo central? y/n: ").lower()
 
     if (opt == 'y' or opt == 'ye' or opt == 'yes'):
-        while True:
-            os.system('cls')
-            mcOpt = input(menuCentral)
-            os.system('cls')
-            match(mcOpt):
-                case "1": name = input("Nombre: ")
-                case "2": host = input("Host: ")
-                case "3": database = input("Database: ")
-                case "4": 
-                    while True:
-                        try:
-                            port = int(input("Port:"))
-                            break
-                        except ValueError:
-                            pass
-                case "5": user = input("Username: ")
-                case "6": password = input("Password: ")
-                case "7": break
-
-        params = {"name" : name, "host" : host, "database" : database, "port" : port, "user" : user, "password" : password }
+        params = {"name" : "", "host" : "", "database" : "", "port" : 0, "user" : "", "password" : "" }
         updateCentral(params)
-
+        
 def deleteNodes():
     _, locals = getNodes()
 
